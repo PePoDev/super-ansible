@@ -1,0 +1,3 @@
+[submodule "roles/riemers.gitlab-runner"]
+	path = roles/riemers.gitlab-runner
+	url = https://github.com/riemers/ansible-gitlab-runner
