@@ -1,0 +1,22 @@
+version: '3'
+services:
+  mongodb:
+    container_name: "mongodb"
+    image: mongo
+    ports:
+      - 1337:1337
+      
+  parse-server:
+    container_name: parse-server
+    restart: always
+    command:
+      - --appId APPLICATION_ID
+      - --masterKey MASTER_KEY
+      - --databaseURI mongodb://mongo/test
+    links:
+      - "mongodb:db"
+    depends_on:
+      - mongodb
+    ports:
+      - 1337:1337
+  

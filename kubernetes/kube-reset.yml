@@ -1,0 +1,77 @@
+---
+- hosts: all
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: reset kubernetes cluster
+      shell: kubeadm reset -f
+
+    - name: Stop service kubelet
+      service:
+        name: kubelet
+        state: stopped
+
+    - name: Stop service docker
+      service:
+        name: docker
+        state: stopped
+
+    - name: remove cni
+      shell: rm -rf /var/lib/cni/ && rm -rf /etc/cni/
+
+    - name: remove interface cni0
+      shell: ip link delete cni0
+
+    - name: remove kubelet
+      shell: rm -rf /var/lib/kubelet/*
+
+    - name: make interface flannel.1 down
+      shell: ifconfig flannel.1 down
+
+    - name: make interface docker0 down
+      shell: ifconfig docker0 down
+
+    - name: remove interface flannel.1
+      shell: ip link delete flannel.1
+
+    - name: start service docker
+      service:
+        name: docker
+        state: started
+
+    - name: start service kubelet
+      service:
+        name: kubelet
+        state: started
+
+    - name: remove unused interface
+      shell: iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X
+
+- hosts: masters
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Remove kube config file
+      shell: rm -rf $HOME/.kube/* 
+
+    - name: Remove cluster_initialized.txt
+      become_user: csag
+      file:
+        path: $HOME/cluster_initialized.txt
+        state: absent
+
+    - name: Remove pod_network_setup.txt
+      become_user: csag
+      file:
+        path: $HOME/pod_network_setup.txt
+        state: absent
+
+- hosts: workers
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Remove node_joined.txt
+      become_user: csag
+      file:
+        path: $HOME/node_joined.txt
+        state: absent

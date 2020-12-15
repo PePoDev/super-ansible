@@ -1,0 +1,24 @@
+---
+- hosts: all
+  gather_facts: false
+  tasks:
+
+    - name: Remove old cadvisor
+      docker_container:
+        name: cAdvisor
+        state: absent
+
+    - name: Install cadvisor
+      docker_container:
+        name: cAdvisor
+        image: google/cadvisor:latest
+        command: --storage_duration=2m0s --profiling=false --version=false --log_cadvisor_usage=false --docker_only=true
+        privileged: yes
+        volumes:
+          - /:/rootfs:ro
+          - /var/run:/var/run:ro
+          - /sys:/sys:ro
+          - /var/lib/docker:/var/lib/docker:ro
+          - /dev/disk:/dev/disk:ro
+        ports:
+          - '0.0.0.0:8181:8080/tcp'

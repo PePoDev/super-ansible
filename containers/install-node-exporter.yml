@@ -1,0 +1,17 @@
+---
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: Install Prometheus node exporter
+      docker_container:
+        name: node-exporter
+        image: quay.io/prometheus/node-exporter
+        state: started
+        recreate: yes
+        restart_policy: always
+        network_mode: host
+        pid_mode: host
+        volumes:
+          - /:/host:ro,rslave
+        command:
+         - --path.rootfs=/host

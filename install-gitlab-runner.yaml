@@ -1,0 +1,24 @@
+---
+- hosts: gitlab_runner
+  vars:
+    gitlab_runner_registration_token: uM3bTDv7L2CGaeVRvW_E
+    gitlab_runner_coordinator_url: https://gitlab.com
+
+    gitlab_runner_runners:
+      - name: runner
+        executor: docker
+        docker_image: alpine
+        tags:
+          - test
+          - test2
+        docker_volumes:
+          # - /var/run/docker.sock:/var/run/docker.sock
+          - /cache
+        # extra_configs:
+        #   runners.docker:
+        #     memory: 512m
+        #     allowed_images: ["ruby:*", "python:*", "php:*"]
+        #   runners.docker.sysctls:
+        #     net.ipv4.ip_forward: "1"
+  roles:
+    - { role: riemers.gitlab-runner }

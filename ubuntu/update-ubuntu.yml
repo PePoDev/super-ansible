@@ -1,0 +1,28 @@
+---
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: Run the equivalent of "apt update" as a separate step
+      apt:
+        update_cache: yes
+
+    - name: Upgrade all packages to the latest version
+      apt:
+        name: "*"
+        state: latest
+
+    - name: Upgrade dist to latest version
+      apt:
+        upgrade: dist
+
+    - name: Upgrade full to latest version
+      apt:
+        upgrade: full
+
+    - name: Remove dependencies that are no longer required
+      apt:
+        autoremove: yes
+
+    - name: Remove useless packages from the cache
+      apt:
+        autoclean: yes

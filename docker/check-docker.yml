@@ -1,0 +1,8 @@
+---
+- hosts: all
+  gather_facts: false
+  tasks:
+  - name: Make sure Docker service is running
+    service:
+      name: docker
+      state: started

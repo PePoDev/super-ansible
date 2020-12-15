@@ -1,0 +1,9 @@
+---
+- hosts: nfs-server
+  become: yes
+  vars:
+    nfs_exports: ["/home/public 10.148.0.0/20(rw,sync,no_subtree_check)"]
+    nfs_rpcbind_state: started
+    nfs_rpcbind_enabled: true
+  roles:
+    - geerlingguy.nfs

@@ -1,0 +1,7 @@
+---
+- hosts: nginx
+  gather_facts: yes
+  become: true
+  roles:
+    - opsta.nginx
+  environment: "{{ proxy_env | default({}) }}"

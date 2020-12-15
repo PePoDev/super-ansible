@@ -1,0 +1,36 @@
+---
+    - hosts: all
+      gather_facts: false
+      tasks:
+        - name: Install required system packages
+          apt:
+            pkg:
+              - apt-transport-https
+              - ca-certificates
+              - curl
+              - software-properties-common
+              - python3-pip
+              - virtualenv
+              - python3-setuptools
+              - fail2ban
+            state: latest
+            update_cache: yes
+
+        - name: Set authorized keys
+          authorized_key:
+            user: csag
+            state: present
+            exclusive: True
+            key: 
+              - https://github.com/pepodev.keys
+              - https://github.com/romeos25.keys
+              - https://gitlab.kmi.tl/tumdef.keys
+            validate_certs: False
+
+        - name: sudo without root
+          lineinfile:
+            path: /etc/sudoers
+            state: present
+            regexp: '^%sudo'
+            line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+            validate: 'visudo -cf %s'

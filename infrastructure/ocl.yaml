@@ -1,0 +1,52 @@
+---
+version: 1
+tasks:
+  terraform-gcp:
+    module: terraform
+    path: ./terraform
+    run: always
+    command: apply
+    exports:
+      - PROJECT_ID # or rename of export parameters with PROJECT_ID:ID 
+
+  terraform-gcp:
+    module: gcloud
+    command: container get-credentials $PROJECT_ID
+    export:
+      - CONTEXT
+
+  provision-server:
+    module: ansible
+    inventory: ./terraform/inventory.ini
+    mode: order # parallel
+    playbooks:
+      - ./ansible/nfs.yaml
+      - ./ansible/gitlab.yaml
+    depends_on:
+      - terraform-gcp
+
+  docker-compose-up:
+    module: docker-compose
+    host: localhost
+    state: up
+    file: ./docker-compose/parse # fodler or file
+
+  helm-install:
+    module: helm
+    context: $CONTEXT
+    command: install
+    charts:
+      - name: mysql
+        file: ./helm/mysql
+        value: ./helm/mysql/value.yaml
+
+  setup-persistent-volume:
+    module: kubectl
+    context: $CONTEXT
+    command: apply
+    mode: order # parallel
+    files:
+      - pv.yaml
+    depends_on:
+      - terraform-gcp
+...
